@@ -10,6 +10,14 @@ Begin VB.Form MENU
    ScaleHeight     =   3015
    ScaleWidth      =   4560
    StartUpPosition =   3  'Windows Default
+   Begin VB.CommandButton BTN_Chat 
+      Caption         =   "Chat"
+      Height          =   375
+      Left            =   240
+      TabIndex        =   3
+      Top             =   1800
+      Width           =   1215
+   End
    Begin VB.CommandButton BTN_BaixarPag 
       Caption         =   "Baixar WebPage"
       Height          =   495
@@ -42,6 +50,10 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Private Sub BTN_BaixarPag_Click()
     DwnldWebPage.Show
+End Sub
+
+Private Sub BTN_Chat_Click()
+    P3_HUB.Show
 End Sub
 
 Private Sub BTN_ExibirIP_Click()
