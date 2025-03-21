@@ -46,5 +46,9 @@ Dim novoForm As New P3_Cliente
 novoForm.LB_Nome.Caption = TXT_Nome.Text
 novoForm.Show
 
+'if P3_Server_CHAT.WindowState
+
+P3_Server_CHAT.Show
+
 Unload Me
 End Sub
