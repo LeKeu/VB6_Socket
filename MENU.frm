@@ -10,6 +10,14 @@ Begin VB.Form MENU
    ScaleHeight     =   3015
    ScaleWidth      =   4560
    StartUpPosition =   3  'Windows Default
+   Begin VB.CommandButton BTN_JogoVelha 
+      Caption         =   "Jogo da Velha"
+      Height          =   375
+      Left            =   240
+      TabIndex        =   4
+      Top             =   2280
+      Width           =   1215
+   End
    Begin VB.CommandButton BTN_Chat 
       Caption         =   "Chat"
       Height          =   375
@@ -58,6 +66,10 @@ End Sub
 
 Private Sub BTN_ExibirIP_Click()
     ExibirIP.Show
+End Sub
+
+Private Sub BTN_JogoVelha_Click()
+    JogoDaVelha.Show
 End Sub
 
 Private Sub BTN_MiniServer_Click()

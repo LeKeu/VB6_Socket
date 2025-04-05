@@ -9,6 +9,16 @@ Begin VB.Form JogoDaVelha
    ScaleHeight     =   3765
    ScaleWidth      =   4695
    StartUpPosition =   3  'Windows Default
+   Begin VB.TextBox TXT_HELP 
+      Alignment       =   2  'Center
+      Height          =   2055
+      Left            =   3480
+      Locked          =   -1  'True
+      MultiLine       =   -1  'True
+      TabIndex        =   13
+      Top             =   1200
+      Width           =   1095
+   End
    Begin VB.TextBox TXT_STATUS 
       Alignment       =   2  'Center
       BackColor       =   &H8000000A&
@@ -113,196 +123,249 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Dim PodeEscolherSimbolo As Boolean
 Dim JogoComecou As Boolean
-Dim JogoAcabou As Boolean
 Dim InicioJogo As Boolean
 
 Dim SimboloJogadorPrincipal As String
 Dim SimboloJogadorIA As String
 
-Dim JogadorFoiUltimo As Boolean
-Dim IAFoiUltimo As Boolean
-
-Dim MelhorMov As Integer
-Dim TemMovsSobrandoBool As Boolean
-
 Dim Botoes(2, 2) As Integer
-'0 é jogador | 1 é IA | -1 é vazio
-Dim Pontuacao(2, 2) As Integer
-Dim RetornoEval As Integer
-Dim RetornoMiniMax As Integer
+Dim score As Integer
+'+1 é jogador | -1 é IA | 0 é vazio
 
-Private Function AcharMelhorMovimento() As Integer()
-    Dim BestVal As Integer
-    BestVal = -1000
-    
-    Dim BestMove(1) As Integer
-    BestMove(0) = -1 ' linha
-    BestMove(1) = -1 ' coluna
-    
-    Dim MoveVal As Integer
-    
-    For i = 0 To 2
-        For j = 0 To 2
-            If Botoes(i, j) = -1 Then
-                Botoes(i, j) = 0
-                MoveVal = MiniMax(0, False)
-                Botoes(i, j) = -1
-                
-                If MoveVal > BestVal Then
-                    BestMove(0) = i ' linha
-                    BestMove(1) = j ' coluna
-                    BestVal = MoveVal
-                End If
-            End If
-        Next j
-    Next i
-    
-    AcharMelhorMovimento = BestMove
-End Function
-
-Private Function MiniMax(ByVal Depth As Integer, ByVal EhMax As Boolean) As Integer
-    Dim PontuacaoEval As Integer
-    
-    PontuacaoEval = Evaluate()
-    
-    If PontuacaoEval = 10 Then
-        MiniMax = PontuacaoEval
-        Exit Function
-    End If
-    
-    If PontuacaoEval = -10 Then
-        MiniMax = PontuacaoEval
-        Exit Function
-    End If
-    
-    TemMovsSobrando
-    
-    If TemMovsSobrandoBool = False Then
-        RetornoMiniMax = 0
-        Exit Function
-    End If
-    
-    If (EhMax = True) Then
-        Dim MelhorMax As Integer
-        MelhorMax = -1000
-        
-        Dim i As Integer
-        Dim j As Integer
-        
-        For i = 0 To 2
-            For j = 0 To 2
-                ' checar se o espaço está vazio
-                If Botoes(i, j) = -1 Then
-                    Botoes(i, j) = 0 ' faz o mov
-                    
-                    ' chama recursivamente uau
-                    MelhorMax = Max(MelhorMax, MiniMax(Depth + 1, Not EhMax))
-                    
-                    Botoes(i, j) = -1 ' faz o mov
-                End If
-            Next j
-        Next i
-        MiniMax = Melhor
-    End If
-    
-    If (EhMax = False) Then
-        Dim MelhorMin As Integer
-        MelhorMin = 1000
-        
-        Dim i2 As Integer
-        Dim j2 As Integer
-        
-        For i2 = 0 To 2
-            For j2 = 0 To 2
-                ' checar se o espaço está vazio
-                If Botoes(i2, j2) = -1 Then
-                    Botoes(i2, j2) = 0 ' faz o mov
-                    
-                    ' chama recursivamente uau
-                    MelhorMin = Min(MelhorMin, MiniMax(Depth + 1, Not EhMax))
-                    
-                    Botoes(i2, j2) = -1 ' faz o mov
-                End If
-            Next j2
-        Next i2
-    End If
-    
-End Function
-
-Private Function Evaluate() As Integer
-    Dim Linha_e As Integer
-    Dim Coluna_e As Integer
-    
-    For Linha_e = 0 To 2
-        If Botoes(Linha_e, 0) = Botoes(Linha_e, 1) And Botoes(Linha_e, 1) = Botoes(Linha_e, 2) Then
-            If (Botoes(Linha_e, 0)) = 0 Then
-                Evaluate = 10
-                Exit Function
-            End If
-            
-            If (Botoes(Linha_e, 0)) = 1 Then
-                Evaluate = -10
-                Exit Function
-            End If
-            
-        End If
-    Next Linha_e
-    
-    For Coluna_e = 0 To 2
-        If Botoes(0, Coluna_e) = Botoes(1, Coluna_e) And Botoes(1, Coluna_e) = Botoes(2, Coluna_e) Then
-            If (Botoes(0, Coluna_e)) = 0 Then
-                Evaluate = 10
-                Exit Function
-            End If
-            
-            If (Botoes(0, Coluna_e)) = 1 Then
-                Evaluate = -10
-                Exit Function
-            End If
-            
-        End If
-    Next Coluna_e
-    
-    If Botoes(0, 0) = Botoes(1, 1) And Botoes(1, 1) = Botoes(2, 2) Then
-        If (Botoes(0, 0)) = 0 Then
-                Evaluate = 10
-                Exit Function
-            End If
-            
-            If (Botoes(0, 0)) = 1 Then
-                Evaluate = -10
-                Exit Function
-            End If
-    End If
-    
-    If Botoes(0, 2) = Botoes(1, 1) And Botoes(1, 1) = Botoes(2, 0) Then
-        If (Botoes(0, 2)) = 0 Then
-                Evaluate = 10
-                Exit Function
-            End If
-            
-            If (Botoes(0, 2)) = 1 Then
-                Evaluate = -10
-                Exit Function
-            End If
-    End If
-    
-    Evaluate = 0 ' caso nenhum tenha ganhado
-End Function
-
-Private Sub TemMovsSobrando()
+Private Function IsMovesLeft() As Boolean
     Dim i As Integer
     Dim j As Integer
     
     For i = 0 To 2
         For j = 0 To 2
-            If Botoes(i, j) = -1 Then
-                TemMovsSobrandoBool = True
-                Exit Sub
+            If Botoes(i, j) = 0 Then
+                IsMovesLeft = True
+                Exit Function
             End If
         Next j
     Next i
-    TemMovsSobrandoBool = False
+    IsMovesLeft = False
+End Function
+
+Private Function IsBoardFull() As Boolean
+    Dim i As Integer
+    Dim j As Integer
+    
+    For i = 0 To 2
+        For j = 0 To 2
+            If Botoes(i, j) = 0 Then
+                IsBoardFull = False
+                Exit Function
+            End If
+        Next j
+    Next i
+    IsBoardFull = True
+End Function
+
+Private Function Get_Best_Move() As Integer()
+    Dim best_score As Integer
+    best_score = -1000
+    
+    Dim BestMove(1) As Integer
+    BestMove(0) = -1
+    BestMove(1) = -1
+        
+    Dim i As Integer
+    Dim j As Integer
+    
+    Dim Score_getBestMove As Integer
+    
+    For i = 0 To 2
+        For j = 0 To 2
+            If Botoes(i, j) = 0 Then
+                Botoes(i, j) = -1
+                Score_getBestMove = MiniMax(0, False)
+                Botoes(i, j) = 0
+                ' teste
+                If Score_getBestMove > best_score Then
+                    best_score = Score_getBestMove
+                    BestMove(0) = i
+                    BestMove(1) = j
+                End If
+            End If
+        Next j
+    Next i
+    Get_Best_Move = BestMove
+End Function
+
+Private Function MiniMax(ByRef Depth As Integer, ByRef is_maximizing As Boolean) As Integer
+    Dim scoreEval As Integer
+    scoreEval = Evaluate()
+    
+    If scoreEval = 10 Then ' player ganhou
+        MiniMax = -1
+        Exit Function
+    End If
+    
+    If scoreEval = -10 Then ' ia ganhou
+        MiniMax = 1
+        Exit Function
+    End If
+    
+    If IsMovesLeft() = False Then
+        MiniMax = 0
+        Exit Function
+    End If
+    
+    If is_maximizing Then
+        Dim bestScore_Max As Integer
+        bestScore_Max = -1000
+        Dim score As Integer
+        
+        For i = 0 To 2
+            For j = 0 To 2
+                If Botoes(i, j) = 0 Then
+                    Botoes(i, j) = -1
+                    score = MiniMax(Depth + 1, False)
+                    Botoes(i, j) = 0
+                    bestScore_Max = Max(score, bestScore_Max)
+                End If
+            Next j
+        Next i
+        MiniMax = bestScore_Max
+        Exit Function
+    Else
+        Dim bestScore_Min As Integer
+        bestScore_Min = 1000
+        Dim score2 As Integer
+        
+        For i = 0 To 2
+            For j = 0 To 2
+                If Botoes(i, j) = 0 Then
+                    Botoes(i, j) = 1
+                    score2 = MiniMax(Depth + 1, True)
+                    Botoes(i, j) = 0
+                    bestScore_Min = Min(score2, bestScore_Min)
+                End If
+            Next j
+        Next i
+        MiniMax = bestScore_Min
+        Exit Function
+    End If
+    
+    
+End Function
+
+Private Sub Jogar()
+    Dim resultado As Integer
+    resultado = Evaluate()
+    
+    If resultado = 10 Then
+        MsgBox "Parabéns! Você venceu!"
+        DesativarBotoesJogo
+        Exit Sub
+    ElseIf resultado = -10 Then
+        MsgBox "Você perdeu para a IA!"
+        DesativarBotoesJogo
+        Exit Sub
+    ElseIf IsMovesLeft() = False Then
+        MsgBox "Empate!"
+        DesativarBotoesJogo
+        Exit Sub
+    End If
+    
+    Dim BestMoveAI() As Integer
+    BestMoveAI = Get_Best_Move()
+    
+    Debug.Print "Melhor linha: " & BestMoveAI(0)
+    Debug.Print "Melhor coluna: " & BestMoveAI(1)
+    
+    Debug.Print "==================================="
+    
+    If BestMoveAI(0) >= 0 And BestMoveAI(0) <= 2 And BestMoveAI(1) >= 0 And BestMoveAI(1) <= 2 Then
+        Botoes(BestMoveAI(0), BestMoveAI(1)) = -1
+        
+        Select Case BestMoveAI(0) & BestMoveAI(1)
+            Case "00"
+                BTN_0.Caption = SimboloJogadorIA
+            Case "01"
+                BTN_1.Caption = SimboloJogadorIA
+            Case "02"
+                BTN_2.Caption = SimboloJogadorIA
+            Case "10"
+                BTN_3.Caption = SimboloJogadorIA
+            Case "11"
+                BTN_4.Caption = SimboloJogadorIA
+            Case "12"
+                BTN_5.Caption = SimboloJogadorIA
+            Case "20"
+                BTN_6.Caption = SimboloJogadorIA
+            Case "21"
+                BTN_7.Caption = SimboloJogadorIA
+            Case "22"
+                BTN_8.Caption = SimboloJogadorIA
+        End Select
+        
+        resultado = Evaluate()
+        
+        If resultado = 10 Then
+            MsgBox "Parabéns! Você venceu!"
+            DesativarBotoesJogo
+        ElseIf resultado = -10 Then
+            MsgBox "Você perdeu para a IA!"
+            DesativarBotoesJogo
+        ElseIf IsMovesLeft() = False Then
+            MsgBox "Empate!"
+            DesativarBotoesJogo
+        End If
+    Else
+        Debug.Print "Erro: Coordenadas inválidas retornadas pelo algoritmo Minimax"
+    End If
+End Sub
+
+
+Private Function Evaluate() As Integer
+    Dim row As Integer
+    Dim col As Integer
+    
+    ' linhas
+    For row = 0 To 2
+        If Botoes(row, 0) = Botoes(row, 1) And Botoes(row, 1) = Botoes(row, 2) Then
+            If Botoes(row, 0) = 1 Then Evaluate = 10: Exit Function
+
+            If Botoes(row, 0) = -1 Then Evaluate = -10: Exit Function
+
+        End If
+    Next row
+    
+    ' colunas
+    For col = 0 To 2
+        If Botoes(0, col) = Botoes(1, col) And Botoes(1, col) = Botoes(2, col) Then
+            If Botoes(0, col) = 1 Then Evaluate = 10: Exit Function
+            
+            If Botoes(0, col) = -1 Then Evaluate = -10: Exit Function
+        End If
+    Next col
+    
+    'diagonal principal
+    If Botoes(0, 0) = Botoes(1, 1) And Botoes(1, 1) = Botoes(2, 2) Then
+        If Botoes(0, 0) = 1 Then Evaluate = 10: Exit Function
+        If Botoes(0, 0) = -1 Then Evaluate = -10: Exit Function
+    End If
+    
+    ' diagonal secondaria
+    If Botoes(0, 2) = Botoes(1, 1) And Botoes(1, 1) = Botoes(2, 0) Then
+        If Botoes(0, 2) = 1 Then Evaluate = 10: Exit Function
+        If Botoes(0, 2) = -1 Then Evaluate = -10: Exit Function
+    End If
+    
+    Evaluate = 0
+    
+End Function
+
+' ==========================================================
+' ==========================================================
+' ==========================================================
+' ==========================================================
+' ==========================================================
+
+Private Sub IniciarJogo()
+    AtivarBotoesJogo
 End Sub
 
 Private Sub IniciarBotoes()
@@ -311,8 +374,7 @@ Private Sub IniciarBotoes()
     
     For i = 0 To 2
         For j = 0 To 2
-            Debug.Print "Definindo Botoes(" & i & "," & j & ") = -1"
-            Botoes(i, j) = -1
+            Botoes(i, j) = 0
         Next j
     Next i
 End Sub
@@ -341,7 +403,7 @@ Private Sub BTN_O_Click()
         BTN_O.Enabled = False
         InicioJogo = True
         
-        Jogar
+        IniciarJogo
     End If
 End Sub
 
@@ -355,97 +417,13 @@ Private Sub BTN_X_Click()
         BTN_O.Enabled = False
         InicioJogo = True
         
-        Jogar
+        IniciarJogo
     End If
 End Sub
 
-Private Sub Jogar()
-    JogoComecou = True
-    
-    If InicioJogo = False Then
-        If JogadorFoiUltimo Then IAJoga
-        If IAFoiUltimo Then JogadorJoga
-    End If
-    
-    If InicioJogo = True Then
-        Dim Vez As Integer
-        'Vez = Int(Rnd * 2)
-        Vez = 0
-        Select Case Vez
-            Case 0
-                JogadorJoga
-            Case 1
-                IAJoga
-        End Select
-        InicioJogo = False
-    End If
-    
-End Sub
-
-Sub JogadorJoga()
-    AtivarBotoesJogo
-    TXT_STATUS.Text = "Sua vez!"
-    TXT_STATUS.BackColor = vbGreen
-    
-    JogadorFoiUltimo = True
-    IAFoiUltimo = False
-    
-    'Jogar
-End Sub
-
-Sub IAJoga()
-    DesativarBotoesJogo
-    TXT_STATUS.Text = "Vez da IA!"
-    TXT_STATUS.BackColor = vbYellow
-    
-    IAFoiUltimo = True
-    JogadorFoiUltimo = False
-    
-    Dim BestMove(1) As Integer
-    Dim TempMove() As Integer
-
-    TempMove = AcharMelhorMovimento()
-
-    BestMove(0) = TempMove(0)
-    BestMove(1) = TempMove(1)
-    
-    Debug.Print "Melhor linha: " & BestMove(0)
-    Debug.Print "Melhor coluna: " & BestMove(1)
-    
-    Dim Resultado As String
-    Resultado = "" + CStr(BestMove(0)) + CStr(BestMove(1))
-    
-    Select Case Resultado
-        Case "00"
-            Botoes(0, 0) = 1
-            BTN_0.Caption = SimboloJogadorIA
-        Case "01"
-            Botoes(0, 1) = 1
-            BTN_1.Caption = SimboloJogadorIA
-        Case "02"
-            Botoes(0, 2) = 1
-            BTN_2.Caption = SimboloJogadorIA
-        Case "10"
-            Botoes(1, 0) = 1
-            BTN_3.Caption = SimboloJogadorIA
-        Case "11"
-            Botoes(1, 1) = 1
-            BTN_4.Caption = SimboloJogadorIA
-        Case "12"
-            Botoes(1, 2) = 1
-            BTN_5.Caption = SimboloJogadorIA
-        Case "20"
-            Botoes(2, 0) = 1
-            BTN_6.Caption = SimboloJogadorIA
-        Case "21"
-            Botoes(2, 1) = 1
-            BTN_7.Caption = SimboloJogadorIA
-        Case "22"
-            Botoes(2, 2) = 1
-            BTN_8.Caption = SimboloJogadorIA
-    End Select
-    
-    'Jogar
+Private Sub AtualizarBarraStatus(ByRef texto As String, ByRef cor As ColorConstants)
+    BarraSTATUS.Text = texto
+    BarraSTATUS.BackColor = cor
 End Sub
 
 Private Sub DesativarBotoesJogo()
@@ -475,7 +453,7 @@ End Sub
 Private Sub BTN_0_Click()
     If BTN_0.Caption = "" Then
         BTN_0.Caption = SimboloJogadorPrincipal
-        Botoes(0, 0) = 0
+        Botoes(0, 0) = 1
         Jogar
     End If
 End Sub
@@ -483,7 +461,7 @@ End Sub
 Private Sub BTN_1_Click()
     If BTN_1.Caption = "" Then
         BTN_1.Caption = SimboloJogadorPrincipal
-        Botoes(0, 1) = 0
+        Botoes(0, 1) = 1
         Jogar
     End If
 End Sub
@@ -491,7 +469,7 @@ End Sub
 Private Sub BTN_2_Click()
     If BTN_2.Caption = "" Then
         BTN_2.Caption = SimboloJogadorPrincipal
-        Botoes(0, 2) = 0
+        Botoes(0, 2) = 1
         Jogar
     End If
 End Sub
@@ -499,7 +477,7 @@ End Sub
 Private Sub BTN_3_Click()
     If BTN_3.Caption = "" Then
         BTN_3.Caption = SimboloJogadorPrincipal
-        Botoes(1, 0) = 0
+        Botoes(1, 0) = 1
         Jogar
     End If
 End Sub
@@ -507,7 +485,7 @@ End Sub
 Private Sub BTN_4_Click()
     If BTN_4.Caption = "" Then
         BTN_4.Caption = SimboloJogadorPrincipal
-        Botoes(1, 1) = 0
+        Botoes(1, 1) = 1
         Jogar
     End If
 End Sub
@@ -515,7 +493,7 @@ End Sub
 Private Sub BTN_5_Click()
     If BTN_5.Caption = "" Then
         BTN_5.Caption = SimboloJogadorPrincipal
-        Botoes(1, 2) = 0
+        Botoes(1, 2) = 1
         Jogar
     End If
 End Sub
@@ -523,7 +501,7 @@ End Sub
 Private Sub BTN_6_Click()
     If BTN_6.Caption = "" Then
         BTN_6.Caption = SimboloJogadorPrincipal
-        Botoes(2, 0) = 0
+        Botoes(2, 0) = 1
         Jogar
     End If
 End Sub
@@ -531,7 +509,7 @@ End Sub
 Private Sub BTN_7_Click()
     If BTN_7.Caption = "" Then
         BTN_7.Caption = SimboloJogadorPrincipal
-        Botoes(2, 1) = 0
+        Botoes(2, 1) = 1
         Jogar
     End If
 End Sub
@@ -539,7 +517,7 @@ End Sub
 Private Sub BTN_8_Click()
     If BTN_8.Caption = "" Then
         BTN_8.Caption = SimboloJogadorPrincipal
-        Botoes(2, 2) = 0
+        Botoes(2, 2) = 1
         Jogar
     End If
 End Sub
@@ -559,3 +537,13 @@ Private Function Min(ByVal a As Integer, ByVal b As Integer) As Integer
         Min = b
     End If
 End Function
+
+Private Sub PrintarMatriz()
+    TXT_HELP.Text = ""
+    For i = 0 To 2
+        For j = 0 To 2
+            TXT_HELP.Text = TXT_HELP.Text & CStr(Botoes(i, j))
+        Next j
+        TXT_HELP.Text = TXT_HELP.Text & vbCrLf
+    Next i
+End Sub
